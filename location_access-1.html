@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share My Location</title>
+<style>
+body{font-family:Arial,sans-serif;text-align:center;padding:40px 20px;background:#f7f7f7}
+.card{max-width:420px;margin:auto;background:white;padding:28px;border-radius:16px;box-shadow:0 4px 18px #0001}
+button{padding:14px 22px;border:0;border-radius:10px;font-size:16px;cursor:pointer}
+#result{margin-top:22px;line-height:1.8;word-break:break-word}
+a{display:inline-block;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>📍 Share My Location</h2>
+<p>Click the button and allow location access.</p>
+<button onclick="getLocation()">📍 Share Location</button>
+<div id="result"></div>
+</div>
+
+<script>
+function getLocation(){
+  const result=document.getElementById("result");
+  if(!navigator.geolocation){
+    result.innerHTML="❌ Location is not supported by this browser.";
+    return;
+  }
+  result.innerHTML="📍 Getting your location...";
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+      const acc=Math.round(pos.coords.accuracy);
+      const map="https://www.google.com/maps?q="+lat+","+lon;
+      result.innerHTML =
+        "✅ Location detected!<br><br>"+
+        "Latitude: "+lat+"<br>"+
+        "Longitude: "+lon+"<br>"+
+        "Accuracy: ~"+acc+" meters<br>"+
+        '<a href="'+map+'" target="_blank">🗺️ Open in Google Maps</a>';
+    },
+    function(){
+      result.innerHTML="❌ Location permission denied or unavailable.";
+    },
+    {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+  );
+}
+</script>
+</body>
+</html>
